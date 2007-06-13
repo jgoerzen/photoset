@@ -63,12 +63,11 @@ sendRequest gr params =
                      _ -> fail $ "Bad HTTP result: " ++ show (rspCode resp) ++
                                   ": " ++ rspReason resp
                          
-    where formdata = (++) "g2_controller=remote:GalleryRemote&" .
-                     urlEncodeVars . 
-                     -- (++) [("g2_controller", "remote.GalleryRemote")] .
+    where formdata = urlEncodeVars . 
+                     (++) [("g2_controller", "remote:GalleryRemote")] .
                      map (\(x, y) -> ("g2_form[" ++ x ++ "]", y)) $
                      (params ++ [("protocol_version", "2.3")])
-          url = (baseURL gr) -- ++ "?g2_controller=remote:GalleryRemote"
+          url = (baseURL gr)
           validateStatus res =
               case lookup "status" res of
                    Nothing -> fail $ "Missing status in result: " ++ show res
