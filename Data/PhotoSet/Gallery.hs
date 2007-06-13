@@ -51,12 +51,13 @@ createGR uri =
 
 sendRequest :: GalleryRemote -> [(String, String)] -> IO [(String, String)]
 sendRequest gr params =
-    do r <- simpleHTTP $ Request url POST [Header HdrContentType contentType]
-                         formdata2
+    do r <- simpleHTTP $ Request url POST 
+                         [Header HdrContentType contentType,
+                          Header HdrContentLength (show (length formdata))]
+                         formdata
        case r of
             Left ce -> fail (show ce)
             Right resp ->
-                do print (rspBody resp)
                    case rspCode resp of
                      (2, _, _) -> validateStatus (parseResult $ rspBody resp)
                      _ -> fail $ "Bad HTTP result: " ++ show (rspCode resp) ++
@@ -78,10 +79,10 @@ sendRequest gr params =
               map convline .
               filter (/= "") .
               map strip .
-              dropWhile (\l -> not (isPrefixOf "#__GR2PROTO__" l)) .
+              tail . dropWhile (\l -> not (isPrefixOf "#__GR2PROTO__" l)) .
               lines
           convline l = 
               case elemIndex '=' l of
-                   Nothing -> error $ "Invalid response line: " ++ l
+                   Nothing -> error $ "Invalid response line: " ++ (show l)
                    Just i -> (take i l, drop (i + 1) l)
 
