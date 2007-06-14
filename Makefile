@@ -23,6 +23,9 @@ clean-code:
 	-rm -rf dist libsrc/dist *.ho *.hi *.o *.a setup *~
 	-rm -f `find . -name "*~"` `find . -name "*.o"`
 	-rm -f `find . -name "*.cm*"`
+	-rm -f `find . -name "*.hi*"`
+	-rm -f `find . -name "*.ho*"`
+	-rm -f `find . -name "*.o*"`
 
 clean-doc:
 	-cd doc && scons -c && scons -c html pdf text ps
