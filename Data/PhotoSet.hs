@@ -62,15 +62,15 @@ class Album a where
 
     albumUpdate :: a -> IO ()
 
-data Photo b => BasicAlbum b = BasicAlbum {
+data BasicAlbum = BasicAlbum {
     balbumId :: String,
     balbumTitle :: String,
     balbumDescription :: String,
     balbumLocation :: String,
-    balbumGetPhotos :: IO [b],
+    balbumGetPhotos :: IO [BasicPhoto],
     balbumUpdate :: IO () }
 
-instance (Photo b) => Album (BasicAlbum b) where
+instance Album BasicAlbum where
     albumId = balbumId
     albumTitle = balbumTitle
     albumDescription = balbumDescription
@@ -78,7 +78,7 @@ instance (Photo b) => Album (BasicAlbum b) where
     albumGetPhotos = balbumGetPhotos
     albumUpdate = balbumUpdate
 
-instance (Photo p) => Show (BasicAlbum p) where
+instance Show BasicAlbum where
     show (BasicAlbum a b c d _ _) = show [a, b, c, d]
 
 class Photo b where
