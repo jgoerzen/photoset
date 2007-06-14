@@ -4,8 +4,8 @@ Please see COPYRIGHT for more details
 -}
 
 {- |
-   Module     : Data.String
-   Copyright  : Copyright (C) 2004-2006 John Goerzen
+   Module     : Data.PhotoSet.Gallery
+   Copyright  : Copyright (C) 2007 John Goerzen
    License    : GNU GPL, version 2 or above
 
    Maintainer : John Goerzen <jgoerzen@complete.org>
@@ -36,7 +36,7 @@ import Data.String
 import Data.List
 
 data GalleryRemote = GalleryRemote {
-        baseURL :: URI
+        baseURL :: String
         }
         deriving (Eq, Show)
 
@@ -44,10 +44,12 @@ contentType = "application/x-www-form-urlencoded"
 protoVer = "2.3"
 
 createGR :: String -> GalleryRemote
-createGR uri =
+createGR = GalleryRemote
+
+url2uri uri = 
     case parseURI uri of
          Nothing -> error $ "Invalid remote URL: " ++ uri
-         Just x -> GalleryRemote x
+         Just x -> x
 
 sendRequest :: GalleryRemote -> [(String, String)] -> IO [(String, String)]
 sendRequest gr params =
@@ -67,7 +69,7 @@ sendRequest gr params =
                      (++) [("g2_controller", "remote:GalleryRemote")] .
                      map (\(x, y) -> ("g2_form[" ++ x ++ "]", y)) $
                      (params ++ [("protocol_version", "2.3")])
-          url = (baseURL gr)
+          url = url2uri (baseURL gr ++ "/main.php")
           validateStatus res =
               case lookup "status" res of
                    Nothing -> fail $ "Missing status in result: " ++ show res
