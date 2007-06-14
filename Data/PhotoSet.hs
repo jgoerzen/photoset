@@ -86,4 +86,13 @@ class Photo b where
     photoLocation :: b -> String
     photoTitle :: b -> String
 
+data BasicPhoto = BasicPhoto {
+    bphotoId :: String,
+    bphotoLocation :: String,
+    bphotoTitle :: String}
+
+instance Photo BasicPhoto where
+    photoId = bphotoId
+    photoLocation = bphotoLocation
+    photoTitle = bphotoTitle
 
