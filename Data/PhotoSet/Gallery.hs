@@ -45,7 +45,7 @@ data GalleryRemote = GalleryRemote {
 data GalleryAlbum = GalleryAlbum [(String, String)]
         deriving (Eq, Show)
 
-instance PhotoSet GalleryRemote where
+instance PhotoSet GalleryRemote BasicAlbum BasicPhoto where
     psLocation = baseURL
     psDriver _ = "GalleryRemote"
     getAlbums gr =
