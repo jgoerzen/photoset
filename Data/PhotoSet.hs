@@ -31,9 +31,9 @@ Written by John Goerzen, jgoerzen\@complete.org
 module Data.PhotoSet where
 
 {- | The main class that defines a storage of photos. -}
-class PhotoSet a where
+class (Photo c, Album b c) => PhotoSet a b c | a -> b where
     -- | Obtain a list of albums
-    getAlbums :: Album b => a -> IO [b]
+    getAlbums :: (Photo c, Album b c) => a -> IO [b]
 
     -- | The location of the top of the store.  Probably a filesystem
     -- path for local items or a URL for remote protocols.
@@ -44,7 +44,7 @@ class PhotoSet a where
 
 {- | The class to hold a collection of 'Photo's.  This may be a directory on
 a filesystem, a set on Flickr, an album in digikam or gallery, etc. -}
-class Album a where
+class Photo b => Album a b | a -> b where
     -- | The unique id for the album.  Implementation-specific.
     albumId :: a -> String
     -- | The short descriptive title for the album.
@@ -70,7 +70,7 @@ data BasicAlbum = BasicAlbum {
     balbumGetPhotos :: IO [BasicPhoto],
     balbumUpdate :: IO () }
 
-instance Album BasicAlbum where
+instance Album BasicAlbum BasicPhoto where
     albumId = balbumId
     albumTitle = balbumTitle
     albumDescription = balbumDescription
