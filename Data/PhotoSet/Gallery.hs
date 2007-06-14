@@ -34,11 +34,37 @@ import Network.URI
 import Network.HTTP
 import Data.String
 import Data.List
+import Data.Maybe.Utils
+import Data.PhotoSet
 
 data GalleryRemote = GalleryRemote {
         baseURL :: String
         }
         deriving (Eq, Show)
+
+data GalleryAlbum = GalleryAlbum [(String, String)]
+        deriving (Eq, Show)
+
+instance PhotoSet GalleryRemote where
+    psLocation = baseURL
+    psDriver _ = "GalleryRemote"
+    getAlbums gr =
+        do r <- sendRequest gr [("cmd", "fetch-albums")]
+           let albumcount = read (forceLookup "album_count" r)
+           return (map (convalbum r) [0..(albumcount - 1)])
+        where convalbum r i =
+                  BasicAlbum {
+                      balbumId = getalb r "name" i,
+                      balbumTitle = getalb r "title" i,
+                      balbumDescription = getalb r "summary" i,
+                      balbumGetPhotos = fail "not implemented",
+                      balbumUpdate = fail "not implemented"}
+
+              getalb r key i = forceLookup ("album." ++ key ++ "." ++ show i) r
+                  
+
+forceLookup key list =
+    forceMaybeMsg (show key) (lookup key list)
 
 contentType = "application/x-www-form-urlencoded"
 protoVer = "2.3"
