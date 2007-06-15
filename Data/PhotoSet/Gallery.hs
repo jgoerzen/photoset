@@ -51,14 +51,18 @@ instance PhotoSet GalleryRemote BasicAlbum BasicPhoto where
     getAlbums gr =
         do r <- sendRequest gr [("cmd", "fetch-albums")]
            let albumcount = read (forceLookup "album_count" r)
-           return (map (convalbum r) [0..(albumcount - 1)])
+           let results = (map (convalbum r) [1..albumcount])
+           print r
+           print results
+           return results
         where convalbum r i =
                   BasicAlbum {
                       balbumId = getalb r "name" i,
                       balbumTitle = getalb r "title" i,
                       balbumDescription = getalb r "summary" i,
                       balbumGetPhotos = fail "not implemented",
-                      balbumUpdate = fail "not implemented"}
+                      balbumUpdate = fail "not implemented",
+                      balbumLocation = baseURL gr ++ "?g2_itemId=" ++ getalb r "name" i}
 
               getalb r key i = forceLookup ("album." ++ key ++ "." ++ show i) r
                   
@@ -95,7 +99,7 @@ sendRequest gr params =
                      (++) [("g2_controller", "remote:GalleryRemote")] .
                      map (\(x, y) -> ("g2_form[" ++ x ++ "]", y)) $
                      (params ++ [("protocol_version", "2.3")])
-          url = url2uri (baseURL gr ++ "/main.php")
+          url = url2uri (baseURL gr)
           validateStatus res =
               case lookup "status" res of
                    Nothing -> fail $ "Missing status in result: " ++ show res

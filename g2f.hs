@@ -7,5 +7,5 @@ main = do
     let gurl = head (lines cfg)
     let gr = createGR gurl
     albums <- getAlbums gr
-    print albums
+    mapM_ print albums
 
